@@ -5,7 +5,9 @@ import LogoMark from "./LogoMark";
 
 import ScrollIndicator from "./ScrollIndicator";
 import Projects from "./Projects";
+import Sobre from "./Sobre";
 import { useProjectTheme } from "./theme.jsx";
+import Contato from "./Contato.jsx";
 
 function useInterval(callback, delay, enabled = true) {
   const saved = useRef(callback);
@@ -18,6 +20,32 @@ function useInterval(callback, delay, enabled = true) {
     const id = setInterval(() => saved.current(), delay);
     return () => clearInterval(id);
   }, [delay, enabled]);
+}
+
+/** easing + scroll controlado */
+function easeInOutCubic(t) {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+function scrollToSection(id, duration = 900) {
+  const el = document.getElementById(id);
+  if (!el) return;
+
+  const start = window.scrollY;
+  const end = el.getBoundingClientRect().top + window.scrollY;
+  const distance = end - start;
+
+  let startTime = null;
+
+  function step(ts) {
+    if (startTime === null) startTime = ts;
+    const t = Math.min((ts - startTime) / duration, 1);
+    const eased = easeInOutCubic(t);
+    window.scrollTo(0, start + distance * eased);
+    if (t < 1) requestAnimationFrame(step);
+  }
+
+  requestAnimationFrame(step);
 }
 
 /** Temas do painel conforme o case ativo */
@@ -91,6 +119,12 @@ const TRACE_BY_THEME = {
   ],
 };
 
+function safeId() {
+  return typeof crypto !== "undefined" && crypto.randomUUID
+    ? crypto.randomUUID()
+    : String(Date.now()) + Math.random().toString(16).slice(2);
+}
+
 function TracePanel() {
   const { projectTheme } = useProjectTheme(); // ui | api | bot
 
@@ -100,7 +134,6 @@ function TracePanel() {
 
   const bank = TRACE_BY_THEME[projectTheme] ?? TRACE_BY_THEME.ui;
 
-  // Reinicia o “stream” quando o tema muda (para a transição ficar nítida)
   useEffect(() => {
     setSeed(0);
     setLines([]);
@@ -108,11 +141,10 @@ function TracePanel() {
 
   const sequence = useMemo(() => {
     const pick = bank[seed % bank.length];
-    const base = [
+    return [
       { type: "meta", text: now() + "  incoming  " + pick.route },
       ...pick.steps.map((s) => ({ type: "step", text: "→ " + s })),
     ];
-    return base;
   }, [seed, bank]);
 
   useInterval(
@@ -120,7 +152,7 @@ function TracePanel() {
       setLines((prev) => {
         const nextIndex = prev.filter(Boolean).length % sequence.length;
         const nextLine = {
-          id: crypto.randomUUID(),
+          id: safeId(),
           kind: sequence[nextIndex].type,
           text: sequence[nextIndex].text,
         };
@@ -204,9 +236,90 @@ function now() {
 }
 
 export default function App() {
+  const [isJumping, setIsJumping] = useState(false);
+  const [sectionTheme, setSectionTheme] = useState("home"); // home | projects | about | contact
+
+  // aplica classe no body pra trocar o "tema" (cores de acento / glow / fundo)
+  useEffect(() => {
+    const cls = [
+      "theme-home",
+      "theme-projects",
+      "theme-about",
+      "theme-contact",
+    ];
+    document.body.classList.remove(...cls);
+    document.body.classList.add(`theme-${sectionTheme}`);
+    return () => {
+      document.body.classList.remove(`theme-${sectionTheme}`);
+    };
+  }, [sectionTheme]);
+
+  function jumpTo(id) {
+    setIsJumping(true);
+    setTimeout(() => scrollToSection(id, 850), 120);
+    setTimeout(() => setIsJumping(false), 950);
+  }
+
+  // detecta qual seção está em foco pra trocar tema
+  useEffect(() => {
+    const ids = ["home", "projetos", "sobre", "contato"];
+    const mapIdToTheme = {
+      home: "home",
+      projetos: "projects",
+      sobre: "about",
+      contato: "contact",
+    };
+
+    const obs = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort(
+            (a, b) => (b.intersectionRatio ?? 0) - (a.intersectionRatio ?? 0)
+          )[0];
+
+        if (!visible) return;
+        const id = visible.target.getAttribute("id");
+        if (id && mapIdToTheme[id]) setSectionTheme(mapIdToTheme[id]);
+      },
+      {
+        root: null,
+        rootMargin: "-40% 0px -55% 0px",
+        threshold: [0, 0.1, 0.25, 0.5, 1],
+      }
+    );
+
+    ids.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) obs.observe(el);
+    });
+
+    return () => obs.disconnect();
+  }, []);
+
   return (
     <>
       <ScrollIndicator />
+
+      <AnimatePresence>
+        {isJumping && (
+          <motion.div
+            className="transitionOverlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18 }}
+          >
+            <motion.div
+              className="transitionWipe"
+              initial={{ scaleY: 0, originY: 1 }}
+              animate={{ scaleY: 1 }}
+              exit={{ scaleY: 0, originY: 0 }}
+              transition={{ duration: 0.35, ease: "easeInOut" }}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="page">
         <header className="topbar">
@@ -221,9 +334,27 @@ export default function App() {
           </div>
 
           <nav className="nav">
-            <a href="#projetos">Projetos</a>
-            <a href="#sobre">Sobre</a>
-            <a href="#contato">Contato</a>
+            <button
+              className="navBtn"
+              type="button"
+              onClick={() => jumpTo("projetos")}
+            >
+              Projetos
+            </button>
+            <button
+              className="navBtn"
+              type="button"
+              onClick={() => jumpTo("sobre")}
+            >
+              Sobre
+            </button>
+            <button
+              className="navBtn"
+              type="button"
+              onClick={() => jumpTo("contato")}
+            >
+              Contato
+            </button>
           </nav>
         </header>
 
@@ -259,12 +390,21 @@ export default function App() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.35, delay: 0.12 }}
             >
-              <a className="btn primary" href="#projetos">
+              <button
+                className="btn primary"
+                type="button"
+                onClick={() => jumpTo("projetos")}
+              >
                 Ver projetos
-              </a>
-              <a className="btn" href="#contato">
-                Entrar em contato
-              </a>
+              </button>
+
+              <button
+                className="btn"
+                type="button"
+                onClick={() => jumpTo("sobre")}
+              >
+                Sobre mim
+              </button>
             </motion.div>
 
             <motion.div
@@ -300,25 +440,9 @@ export default function App() {
 
         <Projects />
 
-        {/* placeholders por enquanto (você pode criar depois) */}
-        <section id="sobre" className="section">
-          <div className="sectionHeader">
-            <h2 className="sectionTitle">Sobre</h2>
-            <p className="sectionLead">
-              Trabalho entre interface e automação: UX clara na ponta,
-              integração robusta por trás.
-            </p>
-          </div>
-        </section>
-
-        <section id="contato" className="section">
-          <div className="sectionHeader">
-            <h2 className="sectionTitle">Contato</h2>
-            <p className="sectionLead">
-              Para propostas, freelas ou parcerias: e-mail, LinkedIn e GitHub.
-            </p>
-          </div>
-        </section>
+        {/* Sobre agora vem do seu componente */}
+        <Sobre />
+        <Contato />
       </div>
     </>
   );
