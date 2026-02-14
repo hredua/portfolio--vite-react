@@ -1,8 +1,8 @@
 export default function Contato() {
-  const email = "SEU_EMAIL@dominio.com";
+  const email = "helamaredua@gmail.com";
   const subject = encodeURIComponent("Projeto / Parceria — Portfólio");
   const body = encodeURIComponent(
-    "Oi Helamã! Vi seu portfólio e queria falar sobre:\n\n• Contexto:\n• Objetivo:\n• Prazo/urgência:\n• Stack/ambiente atual:\n\nPode me responder por aqui. Obrigado!"
+    "Oi Helamã! Vi seu portfólio e queria falar sobre:\n\n• Contexto:\n• Objetivo:\n• Prazo/urgência:\n• Stack/ambiente atual:\n\nPode me responder por aqui. Obrigado!",
   );
 
   const mailto = `mailto:${email}?subject=${subject}&body=${body}`;
@@ -47,7 +47,7 @@ export default function Contato() {
 
           <a
             className="contactCard"
-            href="https://github.com/SEU_USER"
+            href="https://github.com/hredua"
             target="_blank"
             rel="noreferrer"
           >
@@ -55,13 +55,13 @@ export default function Contato() {
               <span className="contactLabel">GitHub</span>
               <span className="contactHint">código e projetos</span>
             </div>
-            <div className="contactValue">github.com/SEU_USER</div>
+            <div className="contactValue">github.com/hredua</div>
             <div className="contactMeta">Repositórios, bots e integrações.</div>
           </a>
 
           <a
             className="contactCard"
-            href="https://www.linkedin.com/in/SEU_USER/"
+            href="https://www.linkedin.com/in/hredua/"
             target="_blank"
             rel="noreferrer"
           >
@@ -69,20 +69,9 @@ export default function Contato() {
               <span className="contactLabel">LinkedIn</span>
               <span className="contactHint">networking</span>
             </div>
-            <div className="contactValue">linkedin.com/in/SEU_USER</div>
+            <div className="contactValue">linkedin.com/in/hredua</div>
             <div className="contactMeta">Vamos conversar por lá também.</div>
           </a>
-
-          <div className="contactCard subtle">
-            <div className="contactCardTop">
-              <span className="contactLabel">Assunto sugerido</span>
-              <span className="contactHint">pra agilizar</span>
-            </div>
-            <div className="contactValue">“Projeto / Parceria — Portfólio”</div>
-            <div className="contactMeta">
-              Inclua: contexto, objetivo, prazo e stack atual.
-            </div>
-          </div>
         </div>
       </div>
     </section>

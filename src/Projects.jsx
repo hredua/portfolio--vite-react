@@ -1,48 +1,8 @@
 import { useEffect, useMemo, useRef } from "react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import { useProjectTheme } from "./theme.jsx";
-
-const PROJECTS = [
-  {
-    id: "rotaz",
-    title: "RotaZ",
-    kind: "api",
-    tagline:
-      "Automação de operação logística com foco em previsibilidade e redução de retrabalho.",
-    bullets: [
-      "Problema: fluxo manual e propenso a erro na organização de entregas.",
-      "Solução: regras de agrupamento + integrações + automação orientada a eventos.",
-      "Impacto: menos tempo operacional e mais consistência no processo.",
-    ],
-    stack: ["React", "Node", "PostgreSQL", "Webhooks", "APIs"],
-  },
-  {
-    id: "telegram-bot",
-    title: "Telegram Bots & Webhooks",
-    kind: "bot",
-    tagline:
-      "Bots resilientes para automação: eventos → validação → ação → resposta.",
-    bullets: [
-      "Problema: mensagens e integrações chegam inconsistentes e fora de ordem.",
-      "Solução: pipeline com validação, logging e idempotência onde necessário.",
-      "Impacto: respostas confiáveis e menos incidentes em produção.",
-    ],
-    stack: ["Node", "Telegram", "Webhooks", "Queues/Jobs", "Observability"],
-  },
-  {
-    id: "react-ui",
-    title: "React UI Systems",
-    kind: "ui",
-    tagline:
-      "Interfaces rápidas e claras: estado, async e feedback do usuário bem resolvidos.",
-    bullets: [
-      "Problema: fricção na UX em fluxos com dados assíncronos.",
-      "Solução: padrões de estado + loading/skeleton + componentes reutilizáveis.",
-      "Impacto: sensação de performance e menor taxa de erro do usuário.",
-    ],
-    stack: ["React", "TypeScript", "Vite", "Framer Motion", "A11y"],
-  },
-];
+import { PROJECTS } from "./projectsData.js";
 
 export default function Projects() {
   const { setProjectTheme } = useProjectTheme();
@@ -53,17 +13,17 @@ export default function Projects() {
   useEffect(() => {
     const opts = {
       root: null,
-      // “ativo” quando o card está no miolo da viewport
+      // "ativo" quando o card esta no miolo da viewport
       rootMargin: "-35% 0px -45% 0px",
       threshold: [0, 0.15, 0.3, 0.6, 1],
     };
 
     const obs = new IntersectionObserver((entries) => {
-      // pega o entry mais visível
+      // pega o entry mais visivel
       const visible = entries
         .filter((e) => e.isIntersecting)
         .sort(
-          (a, b) => (b.intersectionRatio ?? 0) - (a.intersectionRatio ?? 0)
+          (a, b) => (b.intersectionRatio ?? 0) - (a.intersectionRatio ?? 0),
         )[0];
 
       if (!visible) return;
@@ -86,8 +46,8 @@ export default function Projects() {
       <div className="sectionHeader">
         <h2 className="sectionTitle">Projetos</h2>
         <p className="sectionLead">
-          Cases selecionados com foco em impacto: UX, automação e integrações em
-          produção.
+          Cases selecionados com foco em impacto: UX, automacao e integracoes em
+          producao.
         </p>
       </div>
 
@@ -128,11 +88,19 @@ export default function Projects() {
             </div>
 
             <div className="projectActions">
-              <a className="btn primary" href="#contato">
+              <Link className="btn primary" to={`/projetos/${p.id}`}>
+                Ver detalhes
+              </Link>
+              <a className="btn" href="#contato">
                 Discutir este case
               </a>
-              <a className="btn" href="#sobre">
-                Como eu trabalho
+              <a
+                className="btn"
+                href={`${p.links.site || "#sobre"}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Acessar projeto
               </a>
             </div>
           </motion.article>

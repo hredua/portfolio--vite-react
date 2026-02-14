@@ -1,11 +1,14 @@
 :root {
   --bg: #0b0f14;
+  --bg-elev: #121923;
+  --bg-soft: #1a2432;
   --card: rgba(255, 255, 255, 0.06);
   --card2: rgba(255, 255, 255, 0.08);
   --text: rgba(255, 255, 255, 0.92);
   --muted: rgba(255, 255, 255, 0.68);
   --faint: rgba(255, 255, 255, 0.45);
   --line: rgba(255, 255, 255, 0.12);
+  --line-strong: rgba(255, 255, 255, 0.2);
 
   /* tema default (home/projects) */
   --accent: #ff9b4a;
@@ -13,6 +16,9 @@
 
   --shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
   --radius: 18px;
+  --dur-fast: 180ms;
+  --dur-base: 320ms;
+  --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 * {
@@ -26,24 +32,54 @@ body {
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 90px;
 }
 
-body {
-  margin: 0;
-  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
-    Helvetica, Arial;
-  background: radial-gradient(
+/* ====== BACKGROUND LAYER FIXO (um fundo por viewport) ====== */
+.bgLayer {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--bg);
+}
+
+.bgLayer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transition:
+    background var(--dur-base) var(--ease-smooth),
+    filter var(--dur-base) var(--ease-smooth);
+  background:
+    radial-gradient(
       1200px 600px at 20% 10%,
       rgba(var(--accent-rgb), 0.1),
       transparent 55%
     ),
     radial-gradient(
       900px 500px at 80% 20%,
-      rgba(110, 231, 183, 0.08),
+      rgba(255, 255, 255, 0.05),
       transparent 55%
     ),
     var(--bg);
+}
+
+body {
+  margin: 0;
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Helvetica,
+    Arial;
+  background: var(--bg); /* <-- agora é só sólido */
   color: var(--text);
+  transition:
+    background-color var(--dur-base) var(--ease-smooth),
+    color var(--dur-base) var(--ease-smooth);
 }
 
 /* ====== TEMAS POR SEÇÃO (definidos via body.classList) ====== */
@@ -63,35 +99,6 @@ body.theme-contact {
   --accent-rgb: 147, 197, 253;
 }
 
-/* Glow ajustado por tema (sem trocar o “escuro base”) */
-body.theme-about {
-  background: radial-gradient(
-      1100px 520px at 18% 14%,
-      rgba(110, 231, 183, 0.12),
-      transparent 55%
-    ),
-    radial-gradient(
-      900px 500px at 82% 24%,
-      rgba(255, 155, 74, 0.06),
-      transparent 55%
-    ),
-    var(--bg);
-}
-
-body.theme-contact {
-  background: radial-gradient(
-      1100px 520px at 18% 14%,
-      rgba(147, 197, 253, 0.12),
-      transparent 55%
-    ),
-    radial-gradient(
-      900px 500px at 82% 24%,
-      rgba(255, 155, 74, 0.06),
-      transparent 55%
-    ),
-    var(--bg);
-}
-
 /* ====== LAYOUT ====== */
 .page {
   max-width: 1120px;
@@ -108,6 +115,12 @@ body.theme-contact {
   top: 0;
   padding: 12px 0;
   backdrop-filter: blur(10px);
+  background: linear-gradient(
+    to bottom,
+    rgba(11, 15, 20, 0.64),
+    rgba(11, 15, 20, 0.26)
+  );
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   z-index: 20;
 }
 
@@ -134,6 +147,18 @@ body.theme-contact {
   );
   border: 1px solid var(--line);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  transition:
+    transform var(--dur-fast) var(--ease-smooth),
+    border-color var(--dur-fast) var(--ease-smooth),
+    box-shadow var(--dur-fast) var(--ease-smooth);
+}
+
+.logoMark:hover {
+  transform: translateY(-1px);
+  border-color: var(--line-strong);
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(var(--accent-rgb), 0.22);
 }
 
 .logoStroke {
@@ -153,6 +178,7 @@ body.theme-contact {
   stroke: rgba(var(--accent-rgb), 0.75);
   stroke-width: 1.4;
   stroke-linecap: round;
+  transition: stroke var(--dur-fast) var(--ease-smooth);
 }
 
 .logoMark:hover .logoSpark {
@@ -186,7 +212,10 @@ body.theme-contact {
   cursor: pointer;
   padding: 8px 10px;
   border-radius: 10px;
-  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+  transition:
+    background var(--dur-fast) var(--ease-smooth),
+    color var(--dur-fast) var(--ease-smooth),
+    transform var(--dur-fast) var(--ease-smooth);
 }
 
 .navBtn:hover {
@@ -214,8 +243,11 @@ body.theme-contact {
   font-size: 14px;
   gap: 8px;
   cursor: pointer;
-  transition: transform 0.15s ease, background 0.15s ease,
-    border-color 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    transform var(--dur-fast) var(--ease-smooth),
+    background var(--dur-fast) var(--ease-smooth),
+    border-color var(--dur-fast) var(--ease-smooth),
+    box-shadow var(--dur-fast) var(--ease-smooth);
 }
 
 .btn:hover {
@@ -288,6 +320,16 @@ body.theme-contact {
   border-radius: 999px;
   font-size: 12px;
   color: var(--muted);
+  transition:
+    background var(--dur-fast) var(--ease-smooth),
+    border-color var(--dur-fast) var(--ease-smooth),
+    color var(--dur-fast) var(--ease-smooth);
+}
+
+.chip:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--line-strong);
 }
 
 .heroRight {
@@ -307,6 +349,10 @@ body.theme-contact {
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: var(--shadow);
   overflow: hidden;
+  transition:
+    border-color var(--dur-base) var(--ease-smooth),
+    box-shadow var(--dur-base) var(--ease-smooth),
+    background var(--dur-base) var(--ease-smooth);
 }
 
 .traceHeader {
@@ -371,13 +417,15 @@ body.theme-contact {
 }
 
 .cursorText {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-    "Liberation Mono", monospace;
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    monospace;
 }
 
 .traceLines {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-    "Liberation Mono", monospace;
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    monospace;
   font-size: 13px;
   line-height: 1.55;
   color: rgba(255, 255, 255, 0.8);
@@ -412,13 +460,23 @@ body.theme-contact {
   height: 3px;
   width: 100%;
   z-index: 9999;
-  background: rgba(255, 255, 255, 0.06);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.08),
+    rgba(255, 255, 255, 0.03)
+  );
+  backdrop-filter: blur(2px);
 }
 
 .scrollIndicatorBar {
   height: 100%;
-  background: rgba(var(--accent-rgb), 0.85);
+  background: linear-gradient(
+    90deg,
+    rgba(var(--accent-rgb), 0.55),
+    rgba(var(--accent-rgb), 0.95)
+  );
   box-shadow: 0 0 16px rgba(var(--accent-rgb), 0.3);
+  transition: width 80ms linear;
 }
 
 /* ====== SECTIONS ====== */
@@ -472,6 +530,18 @@ body.theme-contact {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  transition:
+    transform var(--dur-fast) var(--ease-smooth),
+    border-color var(--dur-fast) var(--ease-smooth),
+    box-shadow var(--dur-fast) var(--ease-smooth);
+}
+
+.projectCard:hover {
+  transform: translateY(-3px);
+  border-color: rgba(var(--accent-rgb), 0.3);
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(var(--accent-rgb), 0.16) inset;
 }
 
 .projectPill {
@@ -534,22 +604,54 @@ body.theme-contact {
   margin-top: auto;
 }
 
+.projectDetailWrap {
+  padding-top: 56px;
+}
+
+.projectDetailCard {
+  border-radius: var(--radius);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.08),
+    rgba(255, 255, 255, 0.04)
+  );
+  box-shadow: var(--shadow);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.projectDetailTop {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.projectDetailBullets {
+  margin-top: 0;
+}
+
 /* ====== TRACE PANEL THEMES (por case) ====== */
 .trace-ui {
   border-color: rgba(110, 231, 183, 0.18);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45),
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.45),
     0 0 0 1px rgba(110, 231, 183, 0.1) inset;
 }
 
 .trace-api {
   border-color: rgba(255, 155, 74, 0.22);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45),
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.45),
     0 0 0 1px rgba(255, 155, 74, 0.1) inset;
 }
 
 .trace-bot {
   border-color: rgba(147, 197, 253, 0.2);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45),
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.45),
     0 0 0 1px rgba(147, 197, 253, 0.1) inset;
 }
 
@@ -564,7 +666,8 @@ body.theme-contact {
 .transitionWipe {
   position: absolute;
   inset: 0;
-  background: radial-gradient(
+  background:
+    radial-gradient(
       1200px 600px at 20% 10%,
       rgba(var(--accent-rgb), 0.1),
       transparent 55%
@@ -576,6 +679,9 @@ body.theme-contact {
     ),
     rgba(11, 15, 20, 0.92);
   backdrop-filter: blur(10px);
+  transition:
+    opacity var(--dur-base) var(--ease-smooth),
+    transform var(--dur-base) var(--ease-smooth);
 }
 
 /* ====== ABOUT (Sobre) ====== */
@@ -628,6 +734,20 @@ body.theme-contact {
     180deg,
     rgba(255, 255, 255, 0.06),
     rgba(255, 255, 255, 0.03)
+  );
+  transition:
+    transform var(--dur-fast) var(--ease-smooth),
+    border-color var(--dur-fast) var(--ease-smooth),
+    background var(--dur-fast) var(--ease-smooth);
+}
+
+.aboutCard:hover {
+  transform: translateY(-2px);
+  border-color: rgba(var(--accent-rgb), 0.26);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.08),
+    rgba(255, 255, 255, 0.04)
   );
 }
 
@@ -710,18 +830,22 @@ body.theme-contact {
     rgba(255, 255, 255, 0.06),
     rgba(255, 255, 255, 0.03)
   );
-  transition: transform 0.15s ease, border-color 0.15s ease,
-    background 0.15s ease;
+  transition:
+    transform var(--dur-fast) var(--ease-smooth),
+    border-color var(--dur-fast) var(--ease-smooth),
+    background var(--dur-fast) var(--ease-smooth),
+    box-shadow var(--dur-fast) var(--ease-smooth);
 }
 
 .contactCard:hover {
   transform: translateY(-2px);
-  border-color: rgba(255, 255, 255, 0.18);
+  border-color: rgba(var(--accent-rgb), 0.28);
   background: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.075),
     rgba(255, 255, 255, 0.035)
   );
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
 }
 
 .contactCard.subtle {
@@ -759,4 +883,18 @@ body.theme-contact {
   font-size: 12px;
   color: var(--muted);
   line-height: 1.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

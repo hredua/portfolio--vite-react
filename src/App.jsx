@@ -6,8 +6,8 @@ import LogoMark from "./LogoMark";
 import ScrollIndicator from "./ScrollIndicator";
 import Projects from "./Projects";
 import Sobre from "./Sobre";
-import { useProjectTheme } from "./theme.jsx";
 import Contato from "./Contato.jsx";
+import { useProjectTheme } from "./theme.jsx";
 
 function useInterval(callback, delay, enabled = true) {
   const saved = useRef(callback);
@@ -27,12 +27,23 @@ function easeInOutCubic(t) {
   return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
 
+function getTopbarOffset() {
+  const topbar = document.querySelector(".topbar");
+  if (!topbar) return 0;
+  const r = topbar.getBoundingClientRect();
+  // sticky = normalmente altura total
+  return Math.ceil(r.height) + 12; // + respiro
+}
+
 function scrollToSection(id, duration = 900) {
   const el = document.getElementById(id);
   if (!el) return;
 
+  const offset = getTopbarOffset();
   const start = window.scrollY;
-  const end = el.getBoundingClientRect().top + window.scrollY;
+  const targetTop = el.getBoundingClientRect().top + window.scrollY - offset;
+
+  const end = Math.max(0, targetTop);
   const distance = end - start;
 
   let startTime = null;
@@ -177,15 +188,15 @@ function TracePanel() {
       });
     },
     520,
-    !paused
+    !paused,
   );
 
   const title =
     projectTheme === "ui"
       ? "UI Trace"
       : projectTheme === "bot"
-      ? "Bot Trace"
-      : "API Trace";
+        ? "Bot Trace"
+        : "API Trace";
 
   return (
     <div
@@ -235,92 +246,105 @@ function now() {
   return `${hh}:${mm}:${ss}`;
 }
 
+function applyBodyTheme(sectionTheme) {
+  const cls = ["theme-home", "theme-projects", "theme-about", "theme-contact"];
+  document.body.classList.remove(...cls);
+  document.body.classList.add(`theme-${sectionTheme}`);
+}
+
+/**
+ * Driver de tema por seção (sem IntersectionObserver):
+ * Uma “linha de referência” fixa decide qual seção está ativa.
+ * Isso evita trocar cor no meio da seção.
+ */
+function useSectionThemeDriver(setSectionTheme) {
+  useEffect(() => {
+    const sections = [
+      { id: "home", theme: "home" },
+      { id: "projetos", theme: "projects" },
+      { id: "sobre", theme: "about" },
+      { id: "contato", theme: "contact" },
+    ]
+      .map((s) => ({ ...s, el: document.getElementById(s.id) }))
+      .filter((s) => Boolean(s.el));
+
+    // linha de referência: logo abaixo da topbar (mais estável que “metade da tela”)
+    const probeRatio = 0.22;
+
+    let raf = 0;
+    const update = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const probeY =
+          window.innerHeight * probeRatio + getTopbarOffset() * 0.15;
+
+        let active = sections[0];
+        for (const s of sections) {
+          const r = s.el.getBoundingClientRect();
+          if (r.top <= probeY && r.bottom > probeY) {
+            active = s;
+            break;
+          }
+        }
+
+        setSectionTheme((prev) =>
+          prev === active.theme ? prev : active.theme,
+        );
+      });
+    };
+
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, [setSectionTheme]);
+}
+
 export default function App() {
   const [isJumping, setIsJumping] = useState(false);
   const [sectionTheme, setSectionTheme] = useState("home"); // home | projects | about | contact
 
-  // aplica classe no body pra trocar o "tema" (cores de acento / glow / fundo)
+  // aplica o tema no body
   useEffect(() => {
-    const cls = [
-      "theme-home",
-      "theme-projects",
-      "theme-about",
-      "theme-contact",
-    ];
-    document.body.classList.remove(...cls);
-    document.body.classList.add(`theme-${sectionTheme}`);
+    applyBodyTheme(sectionTheme);
     return () => {
       document.body.classList.remove(`theme-${sectionTheme}`);
     };
   }, [sectionTheme]);
 
+  // driver estável do tema por seção (substitui o IntersectionObserver antigo)
+  useSectionThemeDriver(setSectionTheme);
+
   function jumpTo(id) {
+    // enquanto “wipe” acontece, o theme do body pode mudar pelo driver conforme scroll.
     setIsJumping(true);
-    setTimeout(() => scrollToSection(id, 850), 120);
+
+    // inicia a rolagem logo após começar o overlay
+    setTimeout(() => scrollToSection(id, 850), 110);
+
+    // encerra overlay
     setTimeout(() => setIsJumping(false), 950);
   }
 
-  // detecta qual seção está em foco pra trocar tema
-  useEffect(() => {
-    const ids = ["home", "projetos", "sobre", "contato"];
-    const mapIdToTheme = {
-      home: "home",
-      projetos: "projects",
-      sobre: "about",
-      contato: "contact",
-    };
-
-    const obs = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort(
-            (a, b) => (b.intersectionRatio ?? 0) - (a.intersectionRatio ?? 0)
-          )[0];
-
-        if (!visible) return;
-        const id = visible.target.getAttribute("id");
-        if (id && mapIdToTheme[id]) setSectionTheme(mapIdToTheme[id]);
-      },
-      {
-        root: null,
-        rootMargin: "-40% 0px -55% 0px",
-        threshold: [0, 0.1, 0.25, 0.5, 1],
-      }
-    );
-
-    ids.forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) obs.observe(el);
-    });
-
-    return () => obs.disconnect();
-  }, []);
-
   return (
     <>
-      <ScrollIndicator />
-
-      <AnimatePresence>
-        {isJumping && (
-          <motion.div
-            className="transitionOverlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.18 }}
-          >
-            <motion.div
-              className="transitionWipe"
-              initial={{ scaleY: 0, originY: 1 }}
-              animate={{ scaleY: 1 }}
-              exit={{ scaleY: 0, originY: 0 }}
-              transition={{ duration: 0.35, ease: "easeInOut" }}
-            />
-          </motion.div>
-        )}
+      <AnimatePresence initial={false}>
+        <motion.div
+          key={sectionTheme}
+          className="bgLayer"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.35, ease: "easeInOut" }}
+        />
       </AnimatePresence>
 
+      <ScrollIndicator />
       <div className="page">
         <header className="topbar">
           <div className="brand">
@@ -432,15 +456,12 @@ export default function App() {
           <section className="heroRight">
             <TracePanel />
             <div className="miniNote">
-              Simulação de eventos típicos (UI/API/Bot). O tema muda conforme o
-              case em foco.
+              Simulação de eventos típicos (UI/API/Bot).
             </div>
           </section>
         </main>
 
         <Projects />
-
-        {/* Sobre agora vem do seu componente */}
         <Sobre />
         <Contato />
       </div>
