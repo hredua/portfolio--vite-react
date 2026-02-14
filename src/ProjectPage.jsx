@@ -1,30 +1,65 @@
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { getProjectById } from "./projectsData.js";
 import { useProjectTheme } from "./theme.jsx";
 
-function MockupCard({ mockup }) {
+const PROJECT_MOCKUP_ASSETS = import.meta.glob(
+  "./assets/projects/**/*.{png,jpg,jpeg,webp,avif,gif,svg}",
+  {
+    eager: true,
+    import: "default",
+  },
+);
+
+function resolveMockupImage(imagePath) {
+  if (!imagePath) return null;
+
+  const normalized = imagePath.replace(/^\/+/, "");
+  const fullPath = `./assets/projects/${normalized}`;
+
+  return PROJECT_MOCKUP_ASSETS[fullPath] ?? null;
+}
+
+function MockupCard({ mockup, imageSrc }) {
+  const [showImage, setShowImage] = useState(Boolean(imageSrc));
+
+  useEffect(() => {
+    setShowImage(Boolean(imageSrc));
+  }, [imageSrc]);
+
   return (
     <article className="mockupCard">
       <div className={`mockupVisual mockup-${mockup.view}`}>
-        <div className="mockupChrome">
-          <span />
-          <span />
-          <span />
-        </div>
-        <div className="mockupCanvas">
-          <div className="mockupBlock blockWide" />
-          <div className="mockupRow">
-            <div className="mockupBlock" />
-            <div className="mockupBlock" />
-            <div className="mockupBlock" />
-          </div>
-          <div className="mockupBlock blockWide soft" />
-          <div className="mockupRow">
-            <div className="mockupBlock" />
-            <div className="mockupBlock" />
-          </div>
-        </div>
+        {showImage ? (
+          <img
+            className="mockupMedia"
+            src={imageSrc}
+            alt={`Mockup ${mockup.name}`}
+            loading="lazy"
+            onError={() => setShowImage(false)}
+          />
+        ) : (
+          <>
+            <div className="mockupChrome">
+              <span />
+              <span />
+              <span />
+            </div>
+            <div className="mockupCanvas">
+              <div className="mockupBlock blockWide" />
+              <div className="mockupRow">
+                <div className="mockupBlock" />
+                <div className="mockupBlock" />
+                <div className="mockupBlock" />
+              </div>
+              <div className="mockupBlock blockWide soft" />
+              <div className="mockupRow">
+                <div className="mockupBlock" />
+                <div className="mockupBlock" />
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       <div className="mockupContent">
@@ -44,6 +79,14 @@ export default function ProjectPage() {
   const { projectId } = useParams();
   const project = getProjectById(projectId);
   const { setProjectTheme } = useProjectTheme();
+  const mockups = useMemo(() => {
+    if (!project) return [];
+
+    return project.detail.mockups.map((mockup) => ({
+      ...mockup,
+      imageSrc: resolveMockupImage(mockup.image),
+    }));
+  }, [project]);
 
   useEffect(() => {
     if (project) {
@@ -135,8 +178,12 @@ export default function ProjectPage() {
             clareza operacional antes das iteracoes finais.
           </p>
           <div className="mockupsGrid">
-            {project.detail.mockups.map((mockup) => (
-              <MockupCard key={mockup.name} mockup={mockup} />
+            {mockups.map((mockup) => (
+              <MockupCard
+                key={mockup.name}
+                mockup={mockup}
+                imageSrc={mockup.imageSrc}
+              />
             ))}
           </div>
         </article>

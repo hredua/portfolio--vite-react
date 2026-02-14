@@ -714,6 +714,7 @@ body.theme-contact {
 }
 
 .mockupVisual {
+  position: relative;
   padding: 10px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.09);
   background:
@@ -723,6 +724,16 @@ body.theme-contact {
       transparent 70%
     ),
     rgba(255, 255, 255, 0.02);
+}
+
+.mockupMedia {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  display: block;
+  background: rgba(14, 18, 24, 0.72);
 }
 
 .mockupChrome {

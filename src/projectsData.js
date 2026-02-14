@@ -44,6 +44,7 @@ export const PROJECTS = [
           name: "Hero e conversao",
           focus: "Primeiro bloco com proposta clara e CTA de compra",
           view: "desktop",
+          image: "maria-fumaca/hero-conversao.webp",
           notes: [
             "Hierarquia de texto com foco em escaneabilidade",
             "Botoes principais com contraste alto",
@@ -54,6 +55,7 @@ export const PROJECTS = [
           name: "Fluxo de eventos",
           focus: "Consulta de datas e disponibilidade em poucos passos",
           view: "dashboard",
+          image: "maria-fumaca/fluxo-eventos.webp",
           notes: [
             "Cards com estado visual por disponibilidade",
             "Filtros diretos por data e categoria",
@@ -64,6 +66,7 @@ export const PROJECTS = [
           name: "Versao mobile",
           focus: "Leitura rapida e acao com o polegar",
           view: "mobile",
+          image: "maria-fumaca/mobile.webp",
           notes: [
             "Menu simplificado com acesso a compra",
             "Cards compactos com foco em horario",
@@ -121,6 +124,7 @@ export const PROJECTS = [
           name: "Painel de eventos",
           focus: "Visao de filas e estados da operacao",
           view: "dashboard",
+          image: "ownfleet-cg/painel-eventos.webp",
           notes: [
             "Fila por prioridade de carregamento",
             "Log de processamento por lote",
@@ -131,6 +135,7 @@ export const PROJECTS = [
           name: "Mensagens no bot",
           focus: "Comandos e respostas orientadas por contexto",
           view: "mobile",
+          image: "ownfleet-cg/mensagens-bot.webp",
           notes: [
             "Template de mensagem por tipo de alerta",
             "Confirmacao de leitura e acao",
@@ -141,6 +146,7 @@ export const PROJECTS = [
           name: "Regras de despacho",
           focus: "Camada de decisao para roteamento de notificacoes",
           view: "desktop",
+          image: "ownfleet-cg/regras-despacho.webp",
           notes: [
             "Mapa de regras versionado",
             "Fallback para inconsistencias de dados",
@@ -192,6 +198,7 @@ export const PROJECTS = [
           name: "Mapa de agrupamento",
           focus: "Visualizacao das zonas com prioridade operacional",
           view: "dashboard",
+          image: "rotaz/mapa-agrupamento.webp",
           notes: [
             "Clusters por proximidade",
             "Sinalizacao de densidade por area",
@@ -202,6 +209,7 @@ export const PROJECTS = [
           name: "Builder de rota",
           focus: "Sequencia sugerida de paradas com ajuste rapido",
           view: "desktop",
+          image: "rotaz/builder-rota.webp",
           notes: [
             "Cards de parada com metadados",
             "Reordenacao por arrastar e soltar",
@@ -212,6 +220,7 @@ export const PROJECTS = [
           name: "Operacao mobile",
           focus: "Consulta de rota para acompanhamento em campo",
           view: "mobile",
+          image: "rotaz/operacao-mobile.webp",
           notes: [
             "Lista de paradas por prioridade",
             "Status de conclusao por entrega",
