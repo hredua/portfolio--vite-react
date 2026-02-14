@@ -633,6 +633,186 @@ body.theme-contact {
   margin-top: 0;
 }
 
+.projectDetailBody {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
+  max-width: 74ch;
+}
+
+.projectMetaGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.projectMetaCard {
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.projectMetaCard span {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.projectMetaCard strong {
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.projectStoryGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.projectStoryCard {
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 16px;
+}
+
+.projectStoryCard h3 {
+  margin: 0 0 8px;
+  font-size: 17px;
+}
+
+.projectStoryCard p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.projectStoryCard ul {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  color: rgba(255, 255, 255, 0.82);
+  line-height: 1.6;
+}
+
+.mockupsGrid {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.mockupCard {
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+.mockupVisual {
+  padding: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+  background:
+    radial-gradient(
+      380px 220px at 0% 0%,
+      rgba(var(--accent-rgb), 0.16),
+      transparent 70%
+    ),
+    rgba(255, 255, 255, 0.02);
+}
+
+.mockupChrome {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.mockupChrome span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.34);
+}
+
+.mockupCanvas {
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(14, 18, 24, 0.85);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 132px;
+}
+
+.mockupRow {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.mockupBlock {
+  border-radius: 8px;
+  min-height: 18px;
+  background: linear-gradient(
+    90deg,
+    rgba(var(--accent-rgb), 0.25),
+    rgba(255, 255, 255, 0.08)
+  );
+}
+
+.mockupBlock.blockWide {
+  min-height: 30px;
+}
+
+.mockupBlock.soft {
+  opacity: 0.75;
+}
+
+.mockup-desktop .mockupCanvas {
+  min-height: 146px;
+}
+
+.mockup-dashboard .mockupCanvas {
+  min-height: 158px;
+}
+
+.mockup-mobile .mockupCanvas {
+  min-height: 180px;
+}
+
+.mockup-mobile .mockupRow {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.mockupContent {
+  padding: 12px;
+}
+
+.mockupContent h3 {
+  margin: 0 0 6px;
+  font-size: 15px;
+}
+
+.mockupContent p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.mockupContent ul {
+  margin: 10px 0 0;
+  padding-left: 16px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.8);
+}
+
 /* ====== TRACE PANEL THEMES (por case) ====== */
 .trace-ui {
   border-color: rgba(110, 231, 183, 0.18);
@@ -793,6 +973,18 @@ body.theme-contact {
   }
 
   .contactGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .projectMetaGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .projectStoryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .mockupsGrid {
     grid-template-columns: 1fr;
   }
 }
