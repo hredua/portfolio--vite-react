@@ -20,6 +20,93 @@ function resolveMockupImage(imagePath) {
   return PROJECT_MOCKUP_ASSETS[fullPath] ?? null;
 }
 
+const FEATURED_SNIPPET = {
+  title: "Driver estavel de tema por secao",
+  source: "src/App.jsx",
+  why: "Evita flicker de cor durante scroll e melhora previsibilidade visual.",
+  code: `const probeRatio = 0.22;
+
+const update = () => {
+  cancelAnimationFrame(raf);
+  raf = requestAnimationFrame(() => {
+    const probeY =
+      window.innerHeight * probeRatio + getTopbarOffset() * 0.15;
+
+    let active = sections[0];
+    for (const s of sections) {
+      const r = s.el.getBoundingClientRect();
+      if (r.top <= probeY && r.bottom > probeY) {
+        active = s;
+        break;
+      }
+    }
+
+    setSectionTheme((prev) =>
+      prev === active.theme ? prev : active.theme,
+    );
+  });
+};`,
+};
+
+const JS_TOKEN_REGEX =
+  /("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`|\/\/.*|\/\*[\s\S]*?\*\/|\b(?:const|let|var|function|return|if|else|for|while|break|continue|new|class|extends|import|from|export|default|null|true|false)\b|\b\d+(?:\.\d+)?\b|\b[A-Za-z_$][\w$]*(?=\s*\()|=>|===|!==|==|!=|<=|>=|&&|\|\||[{}()[\].,;:+\-*/%<>!=])/g;
+
+function getTokenType(token) {
+  if (token.startsWith("//") || token.startsWith("/*")) return "token-comment";
+  if (
+    token.startsWith('"') ||
+    token.startsWith("'") ||
+    token.startsWith("`")
+  ) {
+    return "token-string";
+  }
+  if (
+    /^(const|let|var|function|return|if|else|for|while|break|continue|new|class|extends|import|from|export|default|null|true|false)$/.test(
+      token,
+    )
+  ) {
+    return "token-keyword";
+  }
+  if (/^\d+(\.\d+)?$/.test(token)) return "token-number";
+  if (/^[A-Za-z_$][\w$]*$/.test(token)) return "token-function";
+  if (/^(=>|===|!==|==|!=|<=|>=|&&|\|\||[+\-*/%<>!=])$/.test(token)) {
+    return "token-operator";
+  }
+  return "token-punctuation";
+}
+
+function tokenizeCode(code) {
+  const tokens = [];
+  let lastIndex = 0;
+
+  for (const match of code.matchAll(JS_TOKEN_REGEX)) {
+    const index = match.index ?? 0;
+    const value = match[0];
+
+    if (index > lastIndex) {
+      tokens.push({
+        type: "token-plain",
+        value: code.slice(lastIndex, index),
+      });
+    }
+
+    tokens.push({
+      type: getTokenType(value),
+      value,
+    });
+    lastIndex = index + value.length;
+  }
+
+  if (lastIndex < code.length) {
+    tokens.push({
+      type: "token-plain",
+      value: code.slice(lastIndex),
+    });
+  }
+
+  return tokens;
+}
+
 function MockupCard({ mockup, imageSrc }) {
   const [showImage, setShowImage] = useState(Boolean(imageSrc));
 
@@ -87,6 +174,10 @@ export default function ProjectPage() {
       imageSrc: resolveMockupImage(mockup.image),
     }));
   }, [project]);
+  const snippetTokens = useMemo(
+    () => tokenizeCode(FEATURED_SNIPPET.code),
+    [],
+  );
 
   useEffect(() => {
     if (project) {
@@ -202,6 +293,24 @@ export default function ProjectPage() {
               <li key={item}>{item}</li>
             ))}
           </ul>
+        </article>
+
+        <article className="projectStoryCard">
+          <h3>Trecho de codigo em destaque</h3>
+          <p>{FEATURED_SNIPPET.why}</p>
+          <div className="snippetMeta">
+            <span>{FEATURED_SNIPPET.title}</span>
+            <code>{FEATURED_SNIPPET.source}</code>
+          </div>
+          <pre className="snippetCode">
+            <code>
+              {snippetTokens.map((token, index) => (
+                <span key={`${token.type}-${index}`} className={token.type}>
+                  {token.value}
+                </span>
+              ))}
+            </code>
+          </pre>
         </article>
 
         <div className="projectActions">

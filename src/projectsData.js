@@ -16,8 +16,7 @@ export const PROJECTS = [
       repo: "https://github.com/hredua/maria-fumaca",
     },
     detail: {
-      hook:
-        "Uma experiencia digital que precisava refletir o valor historico do passeio sem perder performance comercial.",
+      hook: "Uma experiencia digital que precisava refletir o valor historico do passeio sem perder performance comercial.",
       overview:
         "O projeto reorganiza jornada, conteudo e tecnologia para reduzir atrito na compra de ingressos e deixar o site pronto para evolucao continua.",
       context:
@@ -96,8 +95,7 @@ export const PROJECTS = [
     ],
     links: { site: "https://t.me/OwnFleetCG_Bot", repo: null },
     detail: {
-      hook:
-        "Um processo operacional dependente de monitoramento humano continuo foi convertido em notificacoes orientadas por evento.",
+      hook: "Um processo operacional dependente de monitoramento humano continuo foi convertido em notificacoes orientadas por evento.",
       overview:
         "A solucao conecta planilha operacional, regras de negocio e bot no Telegram para acionar motoristas e time interno sem atraso.",
       context:
@@ -170,8 +168,7 @@ export const PROJECTS = [
     stack: ["Node.js", "APIs", "Regras de Negocio", "Automacao", "Integracoes"],
     links: { site: "https://t.me/RotaZPro_Bot", repo: null },
     detail: {
-      hook:
-        "A complexidade de distribuicao foi convertida em um fluxo deterministico de processamento e sugestao de rotas.",
+      hook: "A complexidade de distribuicao foi convertida em um fluxo deterministico de processamento e sugestao de rotas.",
       overview:
         "RotaZ organiza dados de entrega, aplica regras de agrupamento por regiao e entrega um plano operacional pronto para execucao.",
       context:
